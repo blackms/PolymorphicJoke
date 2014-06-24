@@ -150,12 +150,12 @@ void writecode(const char *filename) {
 }
 
 void readcode(const char *filename) {
-  FILE *fp = fopen(filename, "rb");    JUNK;
-  fseek(fp, 0L, SEEK_END);             JUNK;
-  codelen = ftell(fp);
-  code = malloc(codelen);              JUNK;
-  fseek(fp, 0L, SEEK_SET);
-  fread(code, codelen, 1, fp);         JUNK;
+    FILE *fp = fopen(filename, "rb");    JUNK;
+    fseek(fp, 0L, SEEK_END);             JUNK;
+    codelen = ftell(fp);
+    code = malloc(codelen);              JUNK;
+    fseek(fp, 0L, SEEK_SET);
+    fread(code, codelen, 1, fp);         JUNK;
 }
 
 int writeinstruction(unsigned reg, int offset, int space) {

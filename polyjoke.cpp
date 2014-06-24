@@ -86,7 +86,7 @@ int main() {
     return 0
 }
 
-/* LASCIATE OGNI SPERANZA A VOI CHE ENTRATE */
+/* LASCIATE OGNI SPERANZA O VOI CH'ENTRATE */
 /* Il concetto e` quello di creare una lista di N istruzioni, le quali andranno
  * a lavorare tutte sullo stesso registro. La prima istruzione e` un PUSH,
  * mentre l'ultima e` un POP in modo da reinizializzare il valore iniziale del
